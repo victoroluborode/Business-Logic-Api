@@ -1,6 +1,6 @@
 # Business Logic API
 
-A production-ready multi-tenant business logic service built with Node.js, Express, and PostgreSQL, designed to handle complex organizational workflows, resource management, and project coordination for enterprise-scale applications.
+A multi-tenant business logic service built with Node.js, Express, and PostgreSQL, designed to handle complex organizational workflows, resource management, and project coordination for enterprise-scale applications.
 
 ## Features
 

@@ -15,7 +15,8 @@ const createDepartment = async (departmentName, organizationId, parentId) => {
       throw new Error("Department name and organization ID are required.");
     }
   } catch (err) {
-    console.error(err);
+    console.error("Error creating department:", err);
+    throw err;
   }
 };
 

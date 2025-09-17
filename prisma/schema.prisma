@@ -55,6 +55,8 @@ model Project {
   organizationId String
   tasks          Task[]
   resources      ProjectResource[] @relation("ProjectToResources")
+  isDeleted      Boolean      @default(false)
+  deletedAt      DateTime?
 }
 
 model Resource {
@@ -64,6 +66,8 @@ model Resource {
   organization   Organization @relation("OrganizationResources", fields: [organizationId], references: [id])
   organizationId String
   projects       ProjectResource[] @relation("ResourceToProjects")
+  isDeleted      Boolean      @default(false)
+  deletedAt      DateTime?
 }
 
 model ProjectResource {
@@ -104,6 +108,8 @@ model Task {
   assignee       User?        @relation(fields: [assigneeId], references: [id])
   assigneeId     String?
   comments       Comment[]
+  isDeleted      Boolean      @default(false)
+  deletedAt      DateTime?
 }
 
 model Comment {
@@ -117,6 +123,8 @@ model Comment {
   authorId       String
   organization   Organization @relation("OrganizationComments", fields: [organizationId], references: [id])
   organizationId String
+  isDeleted      Boolean      @default(false)
+  deletedAt      DateTime?
 }
 
 model Role {

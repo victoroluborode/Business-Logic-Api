@@ -38,6 +38,7 @@ model User {
   organizationId String
   department     Department?  @relation("DepartmentMembers", fields: [departmentId], references: [id])
   departmentId   String?
+  isDeactivated  Boolean      @default(false)
   tasks          Task[]
   comments       Comment[]    @relation("UserComments")
   activityLogs   ActivityLog[] @relation("UserActivityLogs")

@@ -51,7 +51,7 @@ class ResourceService extends BaseService {
       );
 
       if (!resource) {
-        throw new Error("Project not found.");
+        throw new Error("Resource not found.");
       }
 
       const existingAssignment =

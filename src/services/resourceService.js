@@ -6,31 +6,57 @@ class ResourceService extends BaseService {
   }
 
   async createResource(resourceData) {
+    if (!resourceData) {
+      throw new Error("resourceData is required");
+    }
     return await this.resourceRepository.create({ data: resourceData });
   }
 
   async getResources(resourceQuery) {
+    if (!resourceQuery) {
+      throw new Error("resourceQuery is required");
+    }
+
+    if (typeof resourceQuery !== "object") {
+      throw new Error("resourceQuery must be an object")
+    }
     return await this.resourceRepository.findMany({ where: resourceQuery });
   }
 
   async getResourceById(resourceId) {
+    if (!resourceId) {
+      throw new Error("resourceId is required");
+    }
     return await this.resourceRepository.findUnique({
       where: { id: resourceId },
     });
   }
 
   async deleteResourceById(resourceId) {
+    if (!resourceId) {
+      throw new Error("resourceId is required")
+    }
     return await this.resourceRepository.delete({ where: { id: resourceId } });
   }
 
-  async updateResource(resourceId, updatedData) {
+  async updateResource(resourceId, resourceData) {
+    if (!resourceId || !resourceData) {
+      throw new Error("resourceId and resourceData are required");
+    }
+
+    if (typeof resourceData !== "object") {
+      throw new Error("resourceData must be an object");
+    }
     return await this.resourceRepository.update({
       where: { id: resourceId },
-      data: { ...updatedData },
+      data: { ...resourceData },
     });
   }
 
   async assignResourceToProject(projectId, resourceId) {
+    if (!projectId || !resourceId) {
+      throw new Error("projectId and resourceId are required");
+    }
     return await this.runInTransaction(async (tx) => {
       const project = await this.projectRepository.findUnique(
         {
@@ -87,6 +113,9 @@ class ResourceService extends BaseService {
   }
 
   async getProjectResources(projectId) {
+    if (!projectId) {
+      throw new Error("projectId is required");
+    }
     return await this.projectResourceRepository.findMany({
       where: {
         projectId,

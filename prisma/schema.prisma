@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,89 +8,79 @@ datasource db {
 }
 
 model Organization {
-  id String @id @default(uuid())
-  name String @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  users User[] @relation("OrganizationUsers")
-  projects Project[] @relation("OrganizationProjects")
-  resources Resource[] @relation("OrganizationResources")
-  departments Department[] @relation("OrganizationDepartments")
-  tasks Task[] @relation("OrganizationTasks")
-  comments Comment[] @relation("OrganizationComments")
-  activityLogs ActivityLog[] @relation("OrganizationActivityLogs")
-  projectResources ProjectResource[] @relation("ProjectResourceOrganization")
+  id           String          @id @default(uuid())
+  name         String          @unique
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  users        User[]          @relation("OrganizationUsers")
+  projects     Project[]       @relation("OrganizationProjects")
+  tasks        Task[]          @relation("OrganizationTasks")
+  activityLogs ActivityLog[]   @relation("OrganizationActivityLogs")
 }
 
 model User {
-  id             String       @id @default(uuid())
-  name           String
-  email          String       @unique
-  passwordHash   String
-  role           Role         @relation(fields: [roleId], references: [id])
-  roleId         String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation("OrganizationUsers", fields: [organizationId], references: [id]) 
-  organizationId String
-  department     Department?  @relation("DepartmentMembers", fields: [departmentId], references: [id])
-  departmentId   String?
-  isDeactivated  Boolean      @default(false)
-  tasks          Task[]
-  comments       Comment[]    @relation("UserComments")
-  activityLogs   ActivityLog[] @relation("UserActivityLogs")
+  id               String       @id @default(uuid())
+  name             String
+  email            String       @unique
+  passwordHash     String
+  role             Role         @relation(fields: [roleId], references: [id])
+  roleId           String
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  organization     Organization @relation("OrganizationUsers", fields: [organizationId], references: [id])
+  organizationId   String
+  isDeactivated    Boolean      @default(false)
+  tasks            Task[]
+  activityLogs     ActivityLog[] @relation("UserActivityLogs")
   @@index([organizationId])
 }
 
-model Project {
-  id             String       @id @default(uuid())
-  name           String
-  description    String?
-  status         String       @default("Active")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation("OrganizationProjects", fields: [organizationId], references: [id])
-  organizationId String
-  tasks          Task[]
-  resources      ProjectResource[] @relation("ProjectToResources")
-  isDeleted      Boolean      @default(false)
-  deletedAt      DateTime?
+model Role {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  permissions String[]
+  users       User[]
 }
 
+model Project {
+  id               String    @id @default(uuid())
+  name             String
+  description      String?
+  status           String    @default("Active")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  organization     Organization @relation("OrganizationProjects", fields: [organizationId], references: [id])
+  organizationId   String
+  tasks            Task[]
+  isDeleted        Boolean   @default(false)
+  deletedAt        DateTime?
+}
 
 model Task {
-  id             String       @id @default(uuid())
-  title          String
-  description    String?
-  status         String       @default("Pending")
-  priority       String       @default("Medium")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  organization   Organization @relation("OrganizationTasks", fields: [organizationId], references: [id])
-  organizationId String
-  project        Project?     @relation(fields: [projectId], references: [id])
-  projectId      String?
-  assignee       User?        @relation(fields: [assigneeId], references: [id])
-  assigneeId     String?
-  comments       Comment[]
-  isDeleted      Boolean      @default(false)
-  deletedAt      DateTime?
-}
-
-model Role {
-  id             String        @id @default(uuid())
-  name           String        @unique
-  permissions    String[]
-  users          User[]
+  id               String    @id @default(uuid())
+  title            String
+  description      String?
+  status           String    @default("Pending")
+  priority         String    @default("Medium")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  organization     Organization @relation("OrganizationTasks", fields: [organizationId], references: [id])
+  organizationId   String
+  project          Project?  @relation(fields: [projectId], references: [id])
+  projectId        String?
+  assignee         User?     @relation(fields: [assigneeId], references: [id])
+  assigneeId       String?
+  isDeleted        Boolean   @default(false)
+  deletedAt        DateTime?
 }
 
 model ActivityLog {
-  id             String       @id @default(uuid())
-  action         String
-  details        String?
-  createdAt      DateTime     @default(now())
-  organization   Organization @relation("OrganizationActivityLogs", fields: [organizationId], references: [id])
-  organizationId String
-  user           User?        @relation("UserActivityLogs", fields: [userId], references: [id])
-  userId         String?
+  id               String    @id @default(uuid())
+  action           String
+  details          String?
+  createdAt        DateTime  @default(now())
+  organization     Organization @relation("OrganizationActivityLogs", fields: [organizationId], references: [id])
+  organizationId   String
+  user             User?     @relation("UserActivityLogs", fields: [userId], references: [id])
+  userId           String?
 }

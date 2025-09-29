@@ -1,8 +1,8 @@
 const BaseRepository = require("./baseRepository");
 
 class RolePermissionRepository extends BaseRepository {
-  constructor(organizationId) {
-    super("Role", organizationId);
+  constructor() {
+    super("Role", null);
   }
 
   async findMany(args = {}) {

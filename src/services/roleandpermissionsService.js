@@ -1,8 +1,4 @@
-const prisma = require("../config/prismaClient");
 const BaseService = require("./baseService");
-
-
-
 
 
 class RolePermissionService extends BaseService {
@@ -21,7 +17,7 @@ class RolePermissionService extends BaseService {
             name: roleName,
             permissions: permissions
         }
-        return this.rolePermissionRepository.create({data: roleData});
+        return await this.rolePermissionRepository.create({data: roleData});
     }
 
     async assignRole(roleId, userId) {
@@ -29,25 +25,43 @@ class RolePermissionService extends BaseService {
             throw new Error("Both roleId and userId are required.");
         };
 
-        return this.runInTransaction(async (tx) => {
-            const user = this.userRepository.findUnique({ where: { id: userId } }, tx);
+        return await this.runInTransaction(async (tx) => {
+            const user = await this.userRepository.findUnique({ where: { id: userId } }, tx);
             if (!user) {
               throw new Error(`User with ID ${userId} does not exist`);
             }
-            const role = this.rolePermissionRepository.findUnique({ where: { id: roleId } }, tx);
+            const role = await this.rolePermissionRepository.findUnique({ where: { id: roleId } }, tx);
              if (!role) {
                throw new Error(`Role with ID ${roleId} does not exist.`);
              }
-            const updateUser = this.userRepository.update({
+            const updateUser = await this.userRepository.update({
                 where: { id: userId },
                 data: {roleId: roleId}
-            })
+            }, tx)
 
             return updateUser;
 
         })
     }
-}
+
+    async checkPermission(userId, permission) {
+        if (!userId || !permission) {
+          throw new Error("Both userId and permission are required");
+        }
+
+        const user = await this.userRepository.findUnique({
+            where: { id: userId },
+            include: {role: true}
+        });
+            if (!user || !user.role) {
+                return false;
+            }
+
+        const permissions = user.role.permissions;
+            const hasPermission = permissions.includes(permission);
+            return hasPermission;
+        }
+    }
 
 // const createRole = async (roleName, permissions) => {
 //     try {
@@ -75,75 +89,75 @@ class RolePermissionService extends BaseService {
 //     }
 // }
 
-const assignRole = async (roleId, userId) => {
-    try {
-        if (!userId || !roleId) {
-            throw new Error("Both roleId and userId are required.");
-        };
+// const assignRole = async (roleId, userId) => {
+//     try {
+//         if (!userId || !roleId) {
+//             throw new Error("Both roleId and userId are required.");
+//         };
 
-        const user = await prisma.user.findUnique({
-            where: {id: userId}
-        })
+//         const user = await prisma.user.findUnique({
+//             where: {id: userId}
+//         })
 
-        if (!user) {
-            throw new Error(`User with ID ${userId} does not exist`);
-        }
+//         if (!user) {
+//             throw new Error(`User with ID ${userId} does not exist`);
+//         }
 
-        const role = await prisma.role.findUnique({
-            where: {id: roleId}
-        })
+//         const role = await prisma.role.findUnique({
+//             where: {id: roleId}
+//         })
 
-        if (!role) {
-            throw new Error(`Role with ID ${roleId} does not exist.`);
-        }
+//         if (!role) {
+//             throw new Error(`Role with ID ${roleId} does not exist.`);
+//         }
 
-        const updatedUser = await prisma.user.update({
-            where: { id: userId },
-            data: {
-                roleId: roleId
-            }
-        })
+//         const updatedUser = await prisma.user.update({
+//             where: { id: userId },
+//             data: {
+//                 roleId: roleId
+//             }
+//         })
 
-        return {
-          id: updatedUser.id,
-          name: updatedUser.name,
-          email: updatedUser.email,
-          organizationId: updatedUser.organizationId,
-          roleId: updatedUser.roleId,
-        };
-    } catch (err) {
-        console.error("Error assigning role to user: ", err);
-        throw err;
-    }
-}
+//         return {
+//           id: updatedUser.id,
+//           name: updatedUser.name,
+//           email: updatedUser.email,
+//           organizationId: updatedUser.organizationId,
+//           roleId: updatedUser.roleId,
+//         };
+//     } catch (err) {
+//         console.error("Error assigning role to user: ", err);
+//         throw err;
+//     }
+// }
 
-const checkPermission = async (userId, permission) => {
-    try {
-        if (!userId || !permission) {
-            throw new Error("Both userId and permission are required")
-        }
+// const checkPermission = async (userId, permission) => {
+//     try {
+//         if (!userId || !permission) {
+//             throw new Error("Both userId and permission are required")
+//         }
 
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            include: {role: true}
-        });
+//         const user = await prisma.user.findUnique({
+//             where: { id: userId },
+//             include: {role: true}
+//         });
 
-        if (!user || !user.role) {
-            return false;
-        }
+//         if (!user || !user.role) {
+//             return false;
+//         }
 
-        const permissions = user.role.permissions;
-        const hasPermission = permissions.includes(permission);
-        return hasPermission;
+//         const permissions = user.role.permissions;
+//         const hasPermission = permissions.includes(permission);
+//         return hasPermission;
 
-    } catch (err) {
-        console.error(
-          `Error in checkPermission for userId=${userId}, permission=${permission}:`,
-          err
-        );
-        return false;
-    }
-}
+//     } catch (err) {
+//         console.error(
+//           `Error in checkPermission for userId=${userId}, permission=${permission}:`,
+//           err
+//         );
+//         return false;
+//     }
+// }
 
 
-module.exports = { createRole, assignRole, checkPermission };
+module.exports = RolePermissionService;

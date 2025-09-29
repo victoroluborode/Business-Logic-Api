@@ -9,8 +9,8 @@ class BaseService {
     this.projectRepository = new projectRepository(organizationId);
     this.taskRepository = new taskRepository(organizationId);
     this.userRepository = new userRepository(organizationId);
-    this.organizationRepository = new organizationRepository(organizationId);
-    this.rolePermissionRepository = new rolePermissionRepository(organizationId);
+    this.organizationRepository = new organizationRepository(null);
+    this.rolePermissionRepository = new rolePermissionRepository(null);
     this.organizationId = organizationId;
   }
 

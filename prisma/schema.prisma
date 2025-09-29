@@ -60,39 +60,6 @@ model Project {
   deletedAt      DateTime?
 }
 
-model Resource {
-  id             String       @id @default(uuid())
-  name           String
-  type           String
-  organization   Organization @relation("OrganizationResources", fields: [organizationId], references: [id])
-  organizationId String
-  projects       ProjectResource[] @relation("ResourceToProjects")
-  isDeleted      Boolean      @default(false)
-  deletedAt      DateTime?
-}
-
-model ProjectResource {
-  id String @id @default(uuid())
-  project Project @relation("ProjectToResources", fields: [projectId], references: [id])
-  projectId String
-  resource Resource @relation("ResourceToProjects", fields: [resourceId], references: [id])
-  resourceId String
-  organization Organization @relation("ProjectResourceOrganization", fields: [organizationId], references: [id])
-  organizationId String
-
-  @@unique([projectId, resourceId, organizationId])
-}
-
-model Department {
-  id             String        @id @default(uuid())
-  name           String
-  organization   Organization  @relation("OrganizationDepartments", fields: [organizationId], references: [id])
-  organizationId String
-  parentId       String?
-  parent         Department?   @relation("DepartmentHierarchy", fields: [parentId], references: [id])
-  children       Department[]  @relation("DepartmentHierarchy")
-  members        User[] @relation("DepartmentMembers")
-}
 
 model Task {
   id             String       @id @default(uuid())
@@ -109,21 +76,6 @@ model Task {
   assignee       User?        @relation(fields: [assigneeId], references: [id])
   assigneeId     String?
   comments       Comment[]
-  isDeleted      Boolean      @default(false)
-  deletedAt      DateTime?
-}
-
-model Comment {
-  id             String       @id @default(uuid())
-  text           String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  task           Task         @relation(fields: [taskId], references: [id])
-  taskId         String
-  author         User         @relation("UserComments", fields: [authorId], references: [id])
-  authorId       String
-  organization   Organization @relation("OrganizationComments", fields: [organizationId], references: [id])
-  organizationId String
   isDeleted      Boolean      @default(false)
   deletedAt      DateTime?
 }

@@ -2,6 +2,7 @@ const projectRepository = require("../repositories/projectRepository");
 const taskRepository = require("../repositories/taskRepository");
 const userRepository = require("../repositories/userRepository");
 const organizationRepository = require("../repositories/organizationRepository");
+const rolePermissionRepository = require("../repositories/rolePermissionRepository");
 
 class BaseService {
   constructor(organizationId) {
@@ -9,6 +10,7 @@ class BaseService {
     this.taskRepository = new taskRepository(organizationId);
     this.userRepository = new userRepository(organizationId);
     this.organizationRepository = new organizationRepository(organizationId);
+    this.rolePermissionRepository = new rolePermissionRepository(organizationId);
     this.organizationId = organizationId;
   }
 

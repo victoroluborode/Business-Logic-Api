@@ -1,25 +1,79 @@
 const prisma = require("../config/prismaClient");
+const BaseService = require("./baseService");
 
-const createRole = async (roleName, permissions) => {
-    try {
+
+
+
+
+class RolePermissionService extends BaseService {
+    constructor(organizationId) {
+        super(organizationId)
+    }
+
+    async createRole(roleName, permissions) {
         if (!roleName || !permissions && !Array.isArray(permissions) || permissions.length === 0) {
             throw new Error(
               "Invalid input: roleName must be a string and permissions must be a non-empty array."
             );
         }
-        const role = await prisma.role.create({
-          data: {
-            name: roleName,
-            permissions: permissions,
-          },
-        });
 
-        return role;
-    } catch (err) {
-        console.error("Error creating new role: ", err);
-        throw err;
+        const roleData = {
+            name: roleName,
+            permissions: permissions
+        }
+        return this.rolePermissionRepository.create({data: roleData});
+    }
+
+    async assignRole(roleId, userId) {
+        if (!userId || !roleId) {
+            throw new Error("Both roleId and userId are required.");
+        };
+
+        return this.runInTransaction(async (tx) => {
+            const user = this.userRepository.findUnique({ where: { id: userId } }, tx);
+            if (!user) {
+              throw new Error(`User with ID ${userId} does not exist`);
+            }
+            const role = this.rolePermissionRepository.findUnique({ where: { id: roleId } }, tx);
+             if (!role) {
+               throw new Error(`Role with ID ${roleId} does not exist.`);
+             }
+            const updateUser = this.userRepository.update({
+                where: { id: userId },
+                data: {roleId: roleId}
+            })
+
+            return updateUser;
+
+        })
     }
 }
+
+// const createRole = async (roleName, permissions) => {
+//     try {
+//          if (
+//            !roleName ||
+//            (!permissions && !Array.isArray(permissions)) ||
+//            permissions.length === 0
+//          ) {
+//            throw new Error(
+//              "Invalid input: roleName must be a string and permissions must be a non-empty array."
+//            );
+//          }
+        
+//         const role = await prisma.role.create({
+//           data: {
+//             name: roleName,
+//             permissions: permissions,
+//           },
+//         });
+
+//         return role;
+//     } catch (err) {
+//         console.error("Error creating new role: ", err);
+//         throw err;
+//     }
+// }
 
 const assignRole = async (roleId, userId) => {
     try {

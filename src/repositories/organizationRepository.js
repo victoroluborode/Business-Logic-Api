@@ -1,6 +1,6 @@
 const BaseRepository = require("./baseRepository");
 
-class organizationRepository extends BaseRepository {
+class OrganizationRepository extends BaseRepository {
     constructor() {
         super('Organization', null)
     }
@@ -17,4 +17,4 @@ class organizationRepository extends BaseRepository {
     }
 }
 
-module.exports = organizationRepository;
+module.exports = OrganizationRepository;
